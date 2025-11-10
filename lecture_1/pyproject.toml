@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lecture_1"
+version = "0.1.0"
+description = "file with dependencies for lecture_1"
+authors = [
+    { name = "M-ik-u", email = "bsuprogrammist@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = ["colorama==0.4.6"]
