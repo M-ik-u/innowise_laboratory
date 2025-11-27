@@ -10,6 +10,11 @@ def add_student(name: str) -> None:
 
     :return: None
     """
+    for student in students:
+        if student['name'] == name:
+            print(f"Student {name} already exists.")
+            return
+
     try:
         if not name.isalpha():
             raise ValueError
@@ -68,13 +73,13 @@ def full_report() -> None:
 
     :return: None
     """
-
     print("--- Student report ---")
-    avg_grades = []
 
-    if not len(students):
+    if not students:
         print("No students were found.")
         return
+
+    avg_grades = []
 
     for student in students:
         try:
@@ -90,9 +95,10 @@ def full_report() -> None:
         print("None of the students have any grades.")
         return
 
-    print(f"Max Average: {max(avg_grades)}"
-          f"\nMin Average: {min(avg_grades)}"
-          f"\nOverall Average: {sum(avg_grades)/len(avg_grades)}")
+    print(f"{'-'*23}\n"
+          f"Max Average: {max(avg_grades)}\n"
+          f"Min Average: {min(avg_grades)}\n"
+          f"Overall Average: {sum(avg_grades)/len(avg_grades)}")
 
 
 def top_student() -> None:
@@ -121,15 +127,14 @@ def main() -> None:
 
     :return: None
     """
-    print("--- Student Grade Analyzer ---")
-
     while True:
         try:
-            print("1. Add a new student"
-                  "\n2. Add grades for a student"
-                  "\n3. Generate a full report"
-                  "\n4. Find the top student"
-                  "\n5. Exit program")
+            print("--- Student Grade Analyzer ---\n"
+                  "1. Add a new student\n"
+                  "2. Add grades for a student\n"
+                  "3. Generate a full report\n"
+                  "4. Find the top student\n"
+                  "5. Exit program")
 
             choice = int(input("Enter your choice: "))
 
