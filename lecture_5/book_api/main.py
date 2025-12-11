@@ -6,9 +6,9 @@ from db import SessionLocal
 import models
 import schemas
 
-
 app = FastAPI()
 add_pagination(app)
+
 
 def get_db():
     db = SessionLocal()
@@ -17,40 +17,73 @@ def get_db():
     finally:
         db.close()
 
+
 @app.post("/books/")
-def add_book(book: schemas.AddBook, db: Session = Depends(get_db)) -> None:
-    book = models.Book(title=book.title.capitalize(), author=book.author.capitalize(), year=book.year)
+def add_book(
+        book: schemas.AddBook,
+        db: Session = Depends(get_db)
+) -> None:
+    book = models.Book(
+        title=book.title.strip().title(),
+        author=book.author.strip().title(),
+        year=book.year
+    )
+
     db.add(book)
     db.commit()
     db.refresh(book)
 
-    raise HTTPException(status_code=201, detail=f"Book '{book.title}' successfully added")
+    raise HTTPException(
+        status_code=201,
+        detail=f"Book '{book.title}' successfully added"
+    )
+
 
 @app.get("/books/")
-def get_books(db: Session = Depends(get_db)) -> Page[schemas.BookOut]:
+def get_books(
+        db: Session = Depends(get_db)
+) -> Page[schemas.BookOut]:
     books = db.query(models.Book).all()
     return paginate(books)
 
+
 @app.delete("/books/{book_id}")
-def delete_book(book_id: int, db: Session = Depends(get_db)) -> None:
+def delete_book(
+        book_id: int,
+        db: Session = Depends(get_db)
+) -> None:
     book = db.query(models.Book).get(book_id)
     if not book:
-        raise HTTPException(status_code=404, detail="Book not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Book not found"
+        )
+
     db.delete(book)
     db.commit()
 
-    raise HTTPException(status_code=204, detail=f"Book {book_id} successfully deleted")
+    raise HTTPException(
+        status_code=204,
+        detail=f"Book {book_id} successfully deleted"
+    )
+
 
 @app.put("/books/{book_id}")
-def update_book(book_data: schemas.UpdateBook,book_id: int, db: Session = Depends(get_db)) -> None:
+def update_book(
+        book_data: schemas.UpdateBook,
+        book_id: int,
+        db: Session = Depends(get_db)
+) -> None:
     book = db.query(models.Book).get(book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
     if book_data.title:
-        book.title = book_data.title.capitalize()
+        book.title = book_data.title.strip().title()
+
     if book_data.author:
-        book.author = book_data.author.capitalize()
+        book.author = book_data.author.strip().title()
+
     if book_data.year:
         book.year = book_data.year
 
@@ -58,11 +91,19 @@ def update_book(book_data: schemas.UpdateBook,book_id: int, db: Session = Depend
     db.commit()
     db.refresh(book)
 
-    raise HTTPException(status_code=204, detail=f"Book {book_id} successfully updated")
+    raise HTTPException(
+        status_code=204,
+        detail=f"Book {book_id} successfully updated"
+    )
+
 
 @app.get("/books/search/")
-def search_books(title: Optional[str] = None, author: Optional[str] = None,
-                 year: Optional[int] = None,db: Session = Depends(get_db)) -> Page[schemas.BookOut]:
+def search_books(
+        title: Optional[str] = None,
+        author: Optional[str] = None,
+        year: Optional[int] = None,
+        db: Session = Depends(get_db)
+) -> Page[schemas.BookOut]:
     query = db.query(models.Book)
 
     if title:
